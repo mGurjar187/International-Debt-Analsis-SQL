@@ -1,0 +1,85 @@
+# This line of code connects to the international_debt database in the
+  postgresql server and displays the first 10 rows in international_debt.
+
+%%sql
+postgresql:///international_debt
+SELECT * FROM international_debt LIMIT 10
+
+# Finding the number of distinct countries in the table
+
+%%sql
+SELECT 
+     COUNT(DISTINCT country_name) AS total_distinct_countries
+FROM international_debt;
+
+# Query to find out the distinct debt indicators
+
+%%sql
+SELECT 
+    DISTINCT indicator_code AS distinct_debt_indicators
+FROM international_debt ORDER BY distinct_debt_indicators;
+
+# Query to Total the debt owed by countries
+
+%%sql
+SELECT 
+    ROUND(SUM(debt) / 1000000, 2) AS total_debt
+FROM international_debt; 
+
+# Query to find out the country with highest debt
+
+%%sql
+SELECT 
+    country_name,
+    SUM(debt) AS total_debt
+FROM international_debt
+GROUP BY country_name
+ORDER BY total_debt desc
+LIMIT 1;
+
+# Query to find out the average amount of debt across indicators
+
+%%sql
+SELECT 
+    indicator_code AS debt_indicator,
+    indicator_name,
+    AVG(debt) AS average_debt
+FROM international_debt
+GROUP BY debt_indicator, indicator_name
+ORDER BY average_debt desc
+LIMIT 10;
+
+# Query to find out the country which owes highest amount of principal repayments
+
+%%sql
+SELECT 
+    country_name, 
+    indicator_name
+FROM international_debt
+WHERE debt = (SELECT 
+                 MAX(debt)
+             FROM international_debt
+             WHERE indicator_code = 'DT.AMT.DLXF.CD');
+             
+# Query to find out the most common debt indicator
+
+%%sql
+SELECT 
+    indicator_code, 
+    count(indicator_code) AS indicator_count
+FROM international_debt
+GROUP BY indicator_code
+ORDER BY indicator_count desc, indicator_code desc
+LIMIT 20;
+
+# Query to find out the maximum amount of debt across the indicators along with country names
+
+%%sql
+SELECT 
+    country_name,
+    indicator_code,
+    MAX(debt) AS maximum_debt
+FROM international_debt
+GROUP BY country_name, indicator_code
+ORDER BY maximum_debt desc
+LIMIT 10;
